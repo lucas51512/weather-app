@@ -4,20 +4,27 @@ use Cmfcmf\OpenWeatherMap\Exception as OWMException;
 use Http\Factory\Guzzle\RequestFactory;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 
-require 'src/vendor/autoload.php';
+require '../vendor/autoload.php';
+require 'recebeDados.php';
+
 
 $httpRequestFactory = new RequestFactory();
 $httpClient = GuzzleAdapter::createWithConfig([]);
 
 $own = new OpenWeatherMap('2be75ff732e7ec46598d2b21fce52817', $httpClient, $httpRequestFactory);
 
+if(isset($_POST['dados'])){
+    try {
 
+        $weather = $own->getWeather("$cidade", 'metric', 'de');
+    } catch (OWMException $e) {
+        echo 'OpenWeatherMap exception: ' . $e->getMessage() . '  (Code' . $e->getCode() . ').';
+    } catch (\Exception $e) {
+        echo 'General exception: ' .  $e->getMessage() . '(Code' . $e->getCode() . ').';
+    }
 
-try {
-    $weather = $own->getWeather('Berlin', 'metric', 'de');
-} catch (OWMException $e) {
-    echo 'OpenWeatherMap exception: ' . $e->getMessage() . '  (Code' . $e->getCode() . ').';
-} catch (\Exception $e) {
-    echo 'General exception: ' .  $e->getMessage() . '(Code' . $e->getCode() . ').';
+    $dados = json_encode($weather->temperature);
+
+    echo $dados;
 }
 
